@@ -78,7 +78,7 @@ if (dbCon.IsConnect())
     Console.WriteLine("Now that we are connected, what would you like to do?");
     List<string[]> result = new List<string[]>();
     ans = "";
-    while (ans != "exit")
+    while (ans != "4")
     {
         Console.WriteLine("1. Show\n" +
                           "2. Insert\n" +
@@ -133,13 +133,151 @@ if (dbCon.IsConnect())
                      break;
                  case "3":
                      result.Clear();
-
-
+                     result = query.Show_Airports();
+                     if (result.Count > 0)
+                     {
+                         Console.WriteLine("Airports:");
+                         foreach (string[] airport in result)
+                         {
+                             Console.WriteLine($"ID: {airport[0]}, Name: {airport[1]}, City: {airport[2]}, Country: {airport[3]}, IATA: {airport[4]}, ICAO: {airport[5]}");
+                         }
+                     }
+                     else
+                     {
+                         Console.WriteLine("No airports have been found. Try adding one!");
+                     }
+                     break;
+                 case "4":
+                     result.Clear();
+                     result = query.Show_Flights();
+                     if (result.Count > 0)
+                     {
+                         Console.WriteLine("Flights:");
+                         foreach (string[] flight in result)
+                         {
+                             Console.WriteLine($"ID: {flight[0]}, Flight Number: {flight[1]}, Airline: {flight[2]}, Airplane Model: {flight[3]}, Departure Airport: {flight[4]}, Arrival Airport: {flight[5]}, Departure Time: {flight[6]}, Arrival Time: {flight[7]}");
+                         }
+                     }
+                     else
+                     {
+                         Console.WriteLine("No flights have been found. Try adding one!");
+                     }
                      break;
                 }
+                break;
+            case "2":
+                ans = "";
+                Console.WriteLine("What would you like to add?\n" +
+                                  "1. Airline\n" +
+                                  "2. Airplane\n" +
+                                  "3. Airport\n" +
+                                  "4. Flight");
+                ans = Console.ReadLine();
+                switch (ans)
+                {
+                    case "1":
+                        ans = "";
+                        Console.WriteLine("Enter name:");
+                        string aName = Console.ReadLine();
+                        Console.WriteLine("Enter country:");
+                        string aCountry = Console.ReadLine();
+                        Console.WriteLine("Enter primary airport ID:");
+                        int primaryAId = int.Parse(Console.ReadLine());
+                        bool success = query.Add_Airline(aName, aCountry, primaryAId);
+                        if (success)
+                        {
+                            Console.WriteLine("Everything went well!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Airline could not be added because of an error.");
+                        }
+                        break;
+                    case "2":
+                        ans = "";
+                        Console.WriteLine("Enter model of the (ATR-72):");
+                        string aircraftModel = Console.ReadLine();
+                        Console.WriteLine("Enter manufacturer (ATR):");
+                        string aircraftManufacturer = Console.ReadLine();
+                        Console.WriteLine("Enter seat capacity(72):");
+                        int aircraftCapacity = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter airline ID (Who owns it):");
+                        int aircraftAirlineId = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter registration number (XX-000):");
+                        string aircraftRegistrationNumber = Console.ReadLine();
+                        success = query.Add_Aircraft(aircraftModel, aircraftManufacturer, aircraftCapacity, aircraftAirlineId, aircraftRegistrationNumber);
+                        if (success)
+                        {
+                            Console.WriteLine("Aircraft added successfully :).");
+                        }
+                        else
+                        {
+                            Console.WriteLine("An error has stopped us from inserting.");
+                        }
+                        break;
+                    case "3":
+                        ans = "";
+                        Console.WriteLine("Add Airport:");
+                        Console.WriteLine("Enter name of the airport (In English):");
+                        string airportName = Console.ReadLine();
+                        Console.WriteLine("Enter city:");
+                        string airportCity = Console.ReadLine();
+                        Console.WriteLine("Enter country:");
+                        string airportCountry = Console.ReadLine();
+                        Console.WriteLine("Enter IATA code (3 letters):");
+                        string airportIATA = Console.ReadLine();
+                        Console.WriteLine("Enter ICAO code (4 letters):");
+                        string airportICAO = Console.ReadLine();
+                        success = query.Add_Airport(airportName, airportCity, airportCountry, airportIATA, airportICAO);
+                        if (success)
+                        {
+                            Console.WriteLine("Airport added successfully :D.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("The airport could not be added.");
+                        }
+                        break;
+                    case "4":
+                        ans = "";
+                        Console.WriteLine("Enter flight number (2 letters and 3 numbers:");
+                        string flightNumber = Console.ReadLine();
+                        Console.WriteLine("Enter airline ID:");
+                        int flightAirlineId = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter airplane ID:");
+                        int flightAirplaneId = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter departure airport ID:");
+                        int departureAirportId = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter arrival airport ID:");
+                        int arrivalAirportId = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter departure time (yyyy-mm-dd hh:mm):");
+                        DateTime departureTime = DateTime.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter arrival time (yyyy-mm-dd hh:mm):");
+                        DateTime arrivalTime = DateTime.Parse(Console.ReadLine());
+                        success = query.Add_Flight(flightNumber, flightAirlineId, flightAirplaneId, departureAirportId, arrivalAirportId, departureTime, arrivalTime);
+                        if (success)
+                        {
+                            Console.WriteLine("Flight added successfully >:3");
+                        }
+                        else
+                        {
+                            Console.WriteLine("We could not add flight...");
+                        }
                 
+                        break;
+                        
+                }
+
+                break;
+                case "3":
                     
                 break;
+                case "4":
+                    Console.WriteLine("Closing connection.\nGoodbye, thank you for your cooperation.");
+                    dbCon.Close();
+                    
+                    break;
+                
         }
     }
 }
