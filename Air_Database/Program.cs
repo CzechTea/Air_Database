@@ -6,7 +6,9 @@ using MySqlX.XDevAPI.Common;
 bool ready = false;
 string ans = null;
 var dbCon = DBConnection.Instance();
-Query query = new Query(dbCon);
+Add add = new Add(dbCon);
+Show show = new Show(dbCon);
+Drop drop = new Drop(dbCon);
 Console.WriteLine("Hello, before we begin, we need to know informations about the database.");
 
 do
@@ -19,12 +21,12 @@ do
     }
 
 
-    Console.WriteLine("Got it.. What is the name of the database?");
+    Console.WriteLine("Got it. What is the name of the database?");
     dbCon.DatabaseName = Console.ReadLine();
     while (dbCon.DatabaseName == "")
     {
         Console.WriteLine("If we want to work with the database, we should know the its name.");
-        dbCon.Server = Console.ReadLine();
+        dbCon.DatabaseName = Console.ReadLine();
     }
 
     Console.WriteLine("What is your username of the database? (If empty, then it will be assumed as root)");
@@ -75,14 +77,17 @@ do
 
 if (dbCon.IsConnect())
 {
-    Console.WriteLine("Now that we are connected, what would you like to do?");
+    
+    Console.WriteLine("Now that we are ready to go, what would you like to do?");
     List<string[]> result = new List<string[]>();
+    int id;
+    bool success = false;
     ans = "";
     while (ans != "4")
     {
         Console.WriteLine("1. Show\n" +
                           "2. Insert\n" +
-                          "3. Drop\n" +
+                          "3. Delete\n" +
                           "4. Exit");
         ans = Console.ReadLine();
         switch (ans)
@@ -99,7 +104,7 @@ if (dbCon.IsConnect())
                 {
                  case "1":
                      result.Clear();
-                     result = query.Show_Airlines();
+                     result = show.Show_Airlines();
                     if (result.Count > 0)
                     {
                         Console.WriteLine("Airlines:");
@@ -117,7 +122,7 @@ if (dbCon.IsConnect())
                  case "2":
                      result.Clear();
                  
-                     result = query.Show_Airplanes();
+                     result = show.Show_Airplanes();
 
                      if (result.Count > 0)
                      {
@@ -133,7 +138,7 @@ if (dbCon.IsConnect())
                      break;
                  case "3":
                      result.Clear();
-                     result = query.Show_Airports();
+                     result = show.Show_Airports();
                      if (result.Count > 0)
                      {
                          Console.WriteLine("Airports:");
@@ -149,7 +154,7 @@ if (dbCon.IsConnect())
                      break;
                  case "4":
                      result.Clear();
-                     result = query.Show_Flights();
+                     result = show.Show_Flights();
                      if (result.Count > 0)
                      {
                          Console.WriteLine("Flights:");
@@ -167,7 +172,7 @@ if (dbCon.IsConnect())
                 break;
             case "2":
                 ans = "";
-                Console.WriteLine("What would you like to add?\n" +
+                Console.WriteLine("What would you like to add/insert?\n" +
                                   "1. Airline\n" +
                                   "2. Airplane\n" +
                                   "3. Airport\n" +
@@ -183,7 +188,7 @@ if (dbCon.IsConnect())
                         string aCountry = Console.ReadLine();
                         Console.WriteLine("Enter primary airport ID:");
                         int primaryAId = int.Parse(Console.ReadLine());
-                        bool success = query.Add_Airline(aName, aCountry, primaryAId);
+                        success = add.Add_Airline(aName, aCountry, primaryAId);
                         if (success)
                         {
                             Console.WriteLine("Everything went well!");
@@ -205,7 +210,7 @@ if (dbCon.IsConnect())
                         int aircraftAirlineId = int.Parse(Console.ReadLine());
                         Console.WriteLine("Enter registration number (XX-000):");
                         string aircraftRegistrationNumber = Console.ReadLine();
-                        success = query.Add_Aircraft(aircraftModel, aircraftManufacturer, aircraftCapacity, aircraftAirlineId, aircraftRegistrationNumber);
+                        success = add.Add_Aircraft(aircraftModel, aircraftManufacturer, aircraftCapacity, aircraftAirlineId, aircraftRegistrationNumber);
                         if (success)
                         {
                             Console.WriteLine("Aircraft added successfully :).");
@@ -228,7 +233,7 @@ if (dbCon.IsConnect())
                         string airportIATA = Console.ReadLine();
                         Console.WriteLine("Enter ICAO code (4 letters):");
                         string airportICAO = Console.ReadLine();
-                        success = query.Add_Airport(airportName, airportCity, airportCountry, airportIATA, airportICAO);
+                        success = add.Add_Airport(airportName, airportCity, airportCountry, airportIATA, airportICAO);
                         if (success)
                         {
                             Console.WriteLine("Airport added successfully :D.");
@@ -254,7 +259,7 @@ if (dbCon.IsConnect())
                         DateTime departureTime = DateTime.Parse(Console.ReadLine());
                         Console.WriteLine("Enter arrival time (yyyy-mm-dd hh:mm):");
                         DateTime arrivalTime = DateTime.Parse(Console.ReadLine());
-                        success = query.Add_Flight(flightNumber, flightAirlineId, flightAirplaneId, departureAirportId, arrivalAirportId, departureTime, arrivalTime);
+                        success = add.Add_Flight(flightNumber, flightAirlineId, flightAirplaneId, departureAirportId, arrivalAirportId, departureTime, arrivalTime);
                         if (success)
                         {
                             Console.WriteLine("Flight added successfully >:3");
@@ -270,14 +275,82 @@ if (dbCon.IsConnect())
 
                 break;
                 case "3":
-                    
-                break;
+                    ans = "";
+                    Console.WriteLine("What would you like to delete\n" +
+                                      "1. Airline\n" +
+                                      "2. Airplane\n" +
+                                      "3. Airport\n" +
+                                      "4. Flight");
+                    ans = Console.ReadLine();
+                    switch (ans)
+                    {
+                        case "1":
+                            ans = "";
+                            Console.WriteLine("Enter airline's ID:");
+                            id = int.Parse(Console.ReadLine());
+                            success = drop.Delete_Airline(id);
+                            if (success)
+                            {
+                                Console.WriteLine("Airline has been successfully deleted.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("There was an error. Do you have the correct ID of the airline?");
+                            }
+                            break;
+                        case "2":
+                            ans = "";
+                            Console.WriteLine("Enter airplane's ID:");
+                            id = int.Parse(Console.ReadLine());
+                            success = drop.Delete_Airline(id);
+                            if (success)
+                            {
+                                Console.WriteLine("Airplane has been successfully deleted.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("There was an error. Do you have the correct ID of the airplane?");
+                            }
+                            break;
+                        case "3":
+                            ans = "";
+                            Console.WriteLine("Enter airport's ID:");
+                            id = int.Parse(Console.ReadLine());
+                            success = drop.Delete_Airport(id);
+                            if (success)
+                            {
+                                Console.WriteLine("Airport has been successfully deleted.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("There was an error. Do you have the correct ID of the airport?");
+                            }
+                            break;
+                        case "4":
+                            ans = "";
+                            Console.WriteLine("Enter flight's ID:");
+                            id = int.Parse(Console.ReadLine());
+                            success = drop.Delete_Flight(id);
+                            if (success)
+                            {
+                                Console.WriteLine("Flight has been successfully deleted.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("There was an error. Do you have the correct ID of the Flight?");
+                            }
+                            break;
+
+                    }
+
+                    break;
+
+                   
                 case "4":
                     Console.WriteLine("Closing connection.\nGoodbye, thank you for your cooperation.");
                     dbCon.Close();
                     
                     break;
-                
         }
     }
 }
